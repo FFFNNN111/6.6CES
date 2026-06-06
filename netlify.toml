@@ -1,0 +1,19 @@
+[build]
+  publish = "启动项"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/deepseek-client"
+  to = "/.netlify/functions/deepseek-client"
+  status = 200
+
+[[redirects]]
+  from = "/api/ces-qa"
+  to = "/.netlify/functions/ces-qa"
+  status = 200
+
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/health"
+  status = 200
+
