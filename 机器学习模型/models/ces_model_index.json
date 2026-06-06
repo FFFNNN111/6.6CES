@@ -1,0 +1,43 @@
+{
+  "default_dataset": "unsplit_20260523",
+  "models": [
+    {
+      "dataset_id": "unsplit_20260523",
+      "dataset_name": "未拆分 CES 指标评论分句分类结果",
+      "model_id": "ces_text_classifier_unsplit_20260523",
+      "model_file": "ces_text_classifier.joblib",
+      "schema_file": "ces_label_schema.json",
+      "report_file": "ces_model_report.md",
+      "main_label_count": 12,
+      "sub_label_count": 51,
+      "metrics": {
+        "train_size": 11613,
+        "validation_size": 3872,
+        "main": {
+          "micro_precision": 0.8962443095599393,
+          "micro_recall": 0.8633290699799013,
+          "micro_f1": 0.8794788273615636,
+          "macro_precision": 0.857591699737846,
+          "macro_recall": 0.8254384612735702,
+          "macro_f1": 0.8403768359367944
+        },
+        "sub": {
+          "micro_precision": 0.8871176217147781,
+          "micro_recall": 0.8615663574865751,
+          "micro_f1": 0.8741553157615426,
+          "macro_precision": 0.7916688910437608,
+          "macro_recall": 0.7680707114092323,
+          "macro_f1": 0.7747820090232475
+        },
+        "all": {
+          "micro_precision": 0.8910502656313853,
+          "micro_recall": 0.8623294443345857,
+          "micro_f1": 0.8764546276756103,
+          "macro_precision": 0.8042256165093009,
+          "macro_recall": 0.7789979018595824,
+          "macro_f1": 0.7872762617686847
+        }
+      }
+    }
+  ]
+}

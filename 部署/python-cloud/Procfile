@@ -1,0 +1,1 @@
+web: gunicorn --chdir 后端代理 proxy:app --bind 0.0.0.0:$PORT --timeout 120

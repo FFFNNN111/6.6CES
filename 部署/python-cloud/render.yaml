@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ces-sentiment-python
+    env: docker
+    dockerfilePath: ./部署/python-cloud/Dockerfile
+    envVars:
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_MODEL
+        value: deepseek-chat
+      - key: DEEPSEEK_TIMEOUT
+        value: "12"

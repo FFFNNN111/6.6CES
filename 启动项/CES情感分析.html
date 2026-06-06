@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CES 感知情感分析 · DeepSeek V4 Pro</title>
+<style>
+:root{--bg:#f5f5f7;--ink:#1d1d1f;--muted:#6e6e73;--line:rgba(60,60,67,.16);--surface:rgba(255,255,255,.78);--primary:#007aff;--positive:#248a3d;--negative:#d70015;--neutral:#6e6e73;--accent:#ff9f0a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+*{box-sizing:border-box}html{min-height:100%;background:var(--bg)}body{min-height:100%;margin:0;color:var(--ink);background:linear-gradient(180deg,#fff 0,var(--bg) 430px)}button,textarea,input,select{font:inherit}
+.container{max-width:960px;margin:0 auto;padding:0 16px}
+header{text-align:center;padding:28px 0 18px}
+header h1{font-size:26px;font-weight:700;margin:0 0 4px;letter-spacing:0}
+header p{color:var(--muted);font-size:14px;margin:0}
+.card{background:var(--surface);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.card h2{font-size:17px;margin:0 0 12px;font-weight:600}
+textarea{width:100%;min-height:100px;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:15px;resize:vertical;background:#fff;line-height:1.6}
+textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,122,255,.15)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:500;cursor:pointer;transition:.2s}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:disabled{opacity:.55;cursor:not-allowed}
+.btn-outline{background:#fff;color:var(--primary);border:1px solid rgba(0,122,255,.25)}
+.btn-sm{font-size:13px;padding:7px 12px}.context-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.context-grid label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+.context-grid input,.context-grid select{border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:14px;background:#fff;width:100%}
+.status{font-size:13px;color:var(--muted);margin-top:8px;min-height:18px}.status.ok{color:var(--positive)}.status.bad{color:var(--negative)}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.metric{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+.metric span{display:block;font-size:12px;color:var(--muted);margin-bottom:3px}.metric strong{display:block;font-size:22px;font-weight:700}.metric small{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+.metric.positive{border-left:3px solid var(--positive)}.metric.negative{border-left:3px solid var(--negative)}.metric.neutral{border-left:3px solid var(--neutral)}
+.bar-row{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:13px}.bar-label{width:130px;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bar-track{flex:1;height:18px;background:#eee;border-radius:9px;overflow:hidden;min-width:60px}.bar-fill{height:100%;border-radius:9px;transition:width .3s;min-width:3px}
+.highlight-text{line-height:1.8;padding:12px;background:#fff;border-radius:10px;font-size:14px}mark{background:#fff3cd;color:#856404;padding:2px 4px;border-radius:4px}
+.llm-row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.llm-row p{margin:0;flex:1;font-size:14px}.pos{color:var(--positive)}.neg{color:var(--negative)}.neu{color:var(--neutral)}
+.reasons{margin:0;padding-left:20px;line-height:1.7}.json-out{background:#1d1d1f;color:#98c379;padding:12px;border-radius:10px;font-size:12px;overflow-x:auto;max-height:200px;white-space:pre-wrap}
+.history-table{width:100%;border-collapse:collapse;font-size:13px}.history-table th{background:#f9f9f9;text-align:left;padding:6px 8px;border-bottom:2px solid var(--line);font-weight:600}.history-table td{padding:5px 8px;border-bottom:1px solid var(--line)}.history-table .pos{color:var(--positive);font-weight:600}.history-table .neg{color:var(--negative);font-weight:600}.history-table .neu{color:var(--neutral)}
+.range-row{display:flex;gap:8px;align-items:center;margin:8px 0;font-size:13px;flex-wrap:wrap}.range-row input{width:60px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;text-align:center;font-size:13px}
+.summary-grid{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}.summary-item{background:#fff;border-radius:8px;padding:8px 14px;text-align:center;min-width:80px}.summary-item .v{font-size:18px;font-weight:700}.summary-item .l{font-size:11px;color:var(--muted)}
+details{margin-top:8px}details summary{font-size:15px;font-weight:500;cursor:pointer;padding:6px 0}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 10px;background:#fff;border:1px solid var(--line);font-size:12px;color:var(--muted);margin:0 4px 8px 0}.badge.ok{background:#eaf7ee;color:var(--positive);border-color:#cbe8d3}.badge.bad{background:#fff0f0;color:var(--negative);border-color:#ffd6d6}
+@media(max-width:600px){header h1{font-size:22px}.card{padding:14px}.metric-grid{grid-template-columns:repeat(2,1fr)}.bar-row{font-size:12px}.bar-label{width:90px}.btn-row{flex-direction:column}.btn{width:100%}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>🌿 CES 感知情感分析</h1>
+  <p>DeepSeek V4 Pro + 本地 CES 数据集</p>
+</header>
+
+<div class="card">
+  <h2>📝 输入文本</h2>
+  <textarea id="commentInput" placeholder="输入访谈、评论或语音转写文本……"></textarea>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="analyzeBtn" onclick="analyze()">🔍 开始分析</button>
+    <button class="btn btn-outline btn-sm" onclick="fillExample('pos')">🌞 正面示例</button>
+    <button class="btn btn-outline btn-sm" onclick="fillExample('neg')">🌧 负面示例</button>
+    <button class="btn btn-outline btn-sm" onclick="fillExample('mix')">🌗 混合示例</button>
+    <button class="btn btn-outline btn-sm" onclick="clearAll()">🗑 清空</button>
+  </div>
+  <div class="status" id="statusMsg"></div>
+</div>
+
+<div class="card">
+  <details open>
+    <summary>📍 语境设置与连接状态</summary>
+    <div style="margin:10px 0">
+      <span class="badge" id="backendBadge">DeepSeek 后端未检查</span>
+      <span class="badge" id="deepseekBadge">本地数据集未检查</span>
+      <button class="btn btn-outline btn-sm" onclick="checkHealth()">检查连接</button>
+    </div>
+    <div class="context-grid">
+      <div><label>省份</label><input id="province" value="广东省"></div>
+      <div><label>月份</label><select id="month"><option value="auto">自动</option><option>1月</option><option>2月</option><option>3月</option><option>4月</option><option>5月</option><option>6月</option><option>7月</option><option>8月</option><option>9月</option><option>10月</option><option>11月</option><option>12月</option></select></div>
+      <div><label>公园类型</label><select id="parkType"><option value="auto">自动</option><option>城市公园</option><option>湿地公园</option><option>森林公园</option><option>滨海公园</option><option>社区公园</option></select></div>
+      <div><label>DeepSeek 地址</label><input id="apiBase" value="https://api.deepseek.com"></div>
+      <div><label>DeepSeek API Key</label><input id="deepseekApiKey" type="password" autocomplete="off" placeholder="填入 sk- 开头的 API Key"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-outline btn-sm" onclick="saveDeepSeekSettings()">保存 DeepSeek 设置</button>
+      <button class="btn btn-outline btn-sm" onclick="clearDeepSeekSettings()">清除 Key</button>
+    </div>
+    <p style="color:var(--muted);font-size:12px;line-height:1.6;margin-bottom:0">API Key 只保存在当前浏览器本机。未填写或连接失败时，软件只使用本地 CES 数据集。</p>
+  </details>
+</div>
+
+<div id="resultSection" style="display:none">
+  <div class="card">
+    <h2>📊 多维感知诊断</h2>
+    <div id="providerBadge" class="badge"></div>
+    <div class="metric-grid" id="metricGrid"></div>
+  </div>
+
+  <div class="card">
+    <h2>📈 CES 感知维度 <small id="cesHitCount" style="color:var(--muted);font-weight:400"></small></h2>
+    <div id="cesBars"></div>
+  </div>
+
+  <div class="card">
+    <h2>🧩 CES 二级子类</h2>
+    <div id="subCats" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+  </div>
+
+  <div class="card">
+    <h2>🔍 原文 CES 词频标注</h2>
+    <div class="highlight-text" id="highlighted"></div>
+  </div>
+
+  <div class="card">
+    <h2>💬 分句感知诊断</h2>
+    <div id="sentenceAnalysis"></div>
+  </div>
+
+  <div class="card">
+    <h2>💡 可能原因</h2>
+    <ul class="reasons" id="reasonList"></ul>
+  </div>
+
+  <div class="card">
+    <details>
+      <summary>📋 诊断历史（<span id="historyCount">0</span>）</summary>
+      <div class="range-row">
+        <span>查看第</span><input id="histFrom" value="1" onchange="renderHistory()">
+        <span>至</span><input id="histTo" value="10" onchange="renderHistory()">
+        <span>条 <small id="histTableSummary"></small></span>
+        <button class="btn btn-outline btn-sm" onclick="renderHistory()">刷新</button>
+        <button class="btn btn-outline btn-sm" onclick="clearHistory()">清空</button>
+      </div>
+      <div class="summary-grid" id="histSummary"></div>
+      <table class="history-table">
+        <thead><tr><th>#</th><th>文本</th><th>倾向</th><th>积极概率</th><th>CES</th><th>来源</th><th>时间</th></tr></thead>
+        <tbody id="histBody"></tbody>
+      </table>
+    </details>
+  </div>
+
+  <div class="card">
+    <details>
+      <summary>🧾 原始 JSON <button class="btn btn-outline btn-sm" onclick="copyJson()" id="copyBtn" style="margin-left:10px">复制</button></summary>
+      <pre class="json-out" id="jsonOut"></pre>
+    </details>
+  </div>
+</div>
+
+<div class="card">
+  <h2>❓ CES 智能问答</h2>
+  <textarea id="qaInput" placeholder="例如：为什么遮阴和步道舒适度会影响 CES 感知？" style="min-height:70px"></textarea>
+  <div class="btn-row"><button class="btn btn-primary" onclick="askQuestion()">提问</button></div>
+  <div class="highlight-text" id="qaAnswer" style="margin-top:12px">暂无回答。</div>
+</div>
+
+<div class="footer">CES 感知情感分析 · DeepSeek V4 Pro · 本地数据集</div>
+</div>
+
+<script src="ces_browser_dataset.js"></script>
+<script>
+const API_BASE = location.protocol === "file:" ? "http://127.0.0.1:8088" : location.origin;
+const DEFAULT_DEEPSEEK_API_BASE = "https://api.deepseek.com";
+const STORAGE_DEEPSEEK_API_BASE = "ces_deepseek_api_base";
+const STORAGE_DEEPSEEK_API_KEY = "ces_deepseek_api_key";
+const DEEPSEEK_RETRIES = 5;
+const REQUEST_TIMEOUT_MS = 45000;
+const PROVIDER_DEEPSEEK = "deepseek v4 pro模型+本地数据集回答";
+const PROVIDER_LOCAL = "本地数据集回答";
+const MAX_HISTORY = 50;
+let lastResult = null;
+let diagHistory = [];
+
+function $(id){return document.getElementById(id)}
+function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+function esc(s){return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function fmt(v){return v==null || Number.isNaN(Number(v)) ? "-" : Number(v).toFixed(4)}
+function normalizeDeepSeekUrl(base){var clean=String(base||DEFAULT_DEEPSEEK_API_BASE).replace(/\/+$/,"");return clean.endsWith("/chat/completions")?clean:clean+"/chat/completions"}
+function getDeepSeekApiBase(){return ($("apiBase").value||DEFAULT_DEEPSEEK_API_BASE).trim()}
+function getDeepSeekApiKey(){return ($("deepseekApiKey").value||"").trim()}
+function requireDeepSeekApiKey(){
+  var key=getDeepSeekApiKey();
+  if(!key)throw new Error("请先填写 DeepSeek API Key");
+  return key;
+}
+function loadDeepSeekSettings(){
+  $("apiBase").value=localStorage.getItem(STORAGE_DEEPSEEK_API_BASE)||DEFAULT_DEEPSEEK_API_BASE;
+  $("deepseekApiKey").value=localStorage.getItem(STORAGE_DEEPSEEK_API_KEY)||"";
+}
+function saveDeepSeekSettings(){
+  var base=getDeepSeekApiBase();
+  var key=getDeepSeekApiKey();
+  localStorage.setItem(STORAGE_DEEPSEEK_API_BASE,base||DEFAULT_DEEPSEEK_API_BASE);
+  if(key)localStorage.setItem(STORAGE_DEEPSEEK_API_KEY,key);
+  else localStorage.removeItem(STORAGE_DEEPSEEK_API_KEY);
+  $("backendBadge").textContent=key?"DeepSeek 设置已保存":"未填写 DeepSeek API Key";
+  $("backendBadge").className="badge "+(key?"ok":"bad");
+}
+function clearDeepSeekSettings(){
+  $("deepseekApiKey").value="";
+  localStorage.removeItem(STORAGE_DEEPSEEK_API_KEY);
+  $("backendBadge").textContent="DeepSeek Key 已清除";
+  $("backendBadge").className="badge bad";
+}
+function getContext(){return{province:$("province").value,month:$("month").value,parkType:$("parkType").value}}
+
+function fillExample(type){
+  var t=$("commentInput");
+  if(type==="pos")t.value="这个公园真的太美了！风景如画，绿树成荫，空气特别清新。周末带孩子来散步，孩子玩得很开心。设施也很完善，干净整洁，非常满意！";
+  else if(type==="neg")t.value="这个公园太让人失望了。垃圾到处都是，厕所脏得没法用，设施破旧不堪。绿化也跟不上，到处光秃秃的。完全不值得来。";
+  else t.value="公园整体还不错，风景优美空气好，适合散步锻炼。但是厕所实在太脏了，垃圾桶也满了没人清理，希望能改善管理。";
+}
+
+async function fetchWithTimeout(url,options,timeoutMs){
+  var ctrl=new AbortController(), timer=setTimeout(function(){ctrl.abort()},timeoutMs);
+  try{return await fetch(url,Object.assign({},options,{signal:ctrl.signal}))}
+  finally{clearTimeout(timer)}
+}
+
+async function postJson(path,payload){
+  try{
+    var r=await fetchWithTimeout(API_BASE+path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload||{})},REQUEST_TIMEOUT_MS);
+    var data=await r.json().catch(function(){return{ok:false,message:"后端返回不是 JSON"}});
+    if(!r.ok||data.ok===false)throw new Error(data.message||("HTTP "+r.status));
+    return data;
+  }catch(e){
+    if(String(e.message).indexOf("Failed to fetch")>=0)throw new Error("本地服务不可达");
+    throw e;
+  }
+}
+
+function deepseekMessages(text){
+  var ctx=getContext();
+  var ctxText=Object.keys(ctx).filter(function(k){return ctx[k]&&ctx[k]!=="auto"}).map(function(k){return k+": "+ctx[k]}).join("\n");
+  return [
+    {role:"system",content:"你是 CES 评论情感分析助手。只补充情感、分句情感和原因，不做 CES 分类。必须只输出 JSON，不要 Markdown。字段：sentiment(0消极/1中性/2积极), positive_prob, negative_prob, sentence_analysis[{sentence,sentiment}], reasons[]。"},
+    {role:"user",content:"评论：\n"+text+"\n\n语境：\n"+(ctxText||"无")+"\n\n只输出 JSON。"}
+  ];
+}
+
+function extractJson(raw){
+  var s=String(raw||"").replace(/```json\s*/gi,"").replace(/```\s*/g,"").trim();
+  try{return JSON.parse(s)}catch(e){}
+  var m=s.match(/\{[\s\S]*\}/);if(m)try{return JSON.parse(m[0])}catch(e){}
+  throw new Error("DeepSeek 未返回可解析 JSON");
+}
+
+function shouldRetry(status){return status===429||status>=500}
+
+async function callDeepSeekDirect(messages){
+  var apiKey=requireDeepSeekApiKey();
+  var endpoint=normalizeDeepSeekUrl(getDeepSeekApiBase());
+  var payload={model:"deepseek-chat",messages:messages,temperature:0.2,max_tokens:1000};
+  var lastError=null;
+  for(var i=0;i<DEEPSEEK_RETRIES;i++){
+    try{
+      var resp=await fetchWithTimeout(endpoint,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+apiKey},body:JSON.stringify(payload)},REQUEST_TIMEOUT_MS);
+      if(!resp.ok){
+        var err=new Error("DeepSeek HTTP "+resp.status);err.status=resp.status;
+        if(resp.status===401||resp.status===403||!shouldRetry(resp.status)||i===DEEPSEEK_RETRIES-1)throw err;
+      }else{
+        var data=await resp.json();
+        return data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:"";
+      }
+    }catch(e){lastError=e;if(e.status===401||e.status===403||i===DEEPSEEK_RETRIES-1)break}
+    await sleep(350*(i+1));
+  }
+  throw lastError||new Error("DeepSeek 连接失败");
+}
+
+async function callDeepSeekRelay(messages){
+  var data=await postJson("/api/deepseek-client",{api_key:requireDeepSeekApiKey(),api_base:getDeepSeekApiBase(),model:"deepseek-chat",messages:messages,temperature:0.2,max_tokens:1000,retries:DEEPSEEK_RETRIES});
+  return data.content||"";
+}
+
+async function callDeepSeek(messages){
+  try{return await callDeepSeekRelay(messages)}
+  catch(e1){try{return await callDeepSeekDirect(messages)}catch(e2){throw new Error(e2.message||e1.message||"DeepSeek 连接失败")}}
+}
+
+async function getLocalAnalysis(text){
+  try{
+    return await postJson("/api/text-analysis",{text:text,context:getContext(),skip_deepseek:true});
+  }catch(e){
+    $("deepseekBadge").textContent="浏览器本地数据集可用";
+    $("deepseekBadge").className="badge ok";
+    return browserLocalAnalysis(text,e);
+  }
+}
+
+function browserLocalAnalysis(text,error){
+  var ds=window.CES_BROWSER_DATASET||{}, taxonomy=Array.isArray(ds.taxonomy)?ds.taxonomy:[], stats=ds.training_stats||{};
+  var dims=[], subs=[], keywords=[], reasons=[];
+  taxonomy.forEach(function(cat){
+    var catHits=[], subHits=[];
+    (cat.subcategories||[]).forEach(function(sub){
+      var hits=(sub.keywords||[]).filter(function(kw){return kw&&text.indexOf(kw)>=0});
+      if(hits.length){
+        hits.forEach(function(kw){if(keywords.indexOf(kw)<0)keywords.push(kw)});
+        catHits=catHits.concat(hits);
+        subHits.push({
+          key:sub.key||"",
+          subcategory:sub.name||"",
+          category:cat.category||"",
+          code:cat.code||"",
+          keywords:hits,
+          frequency:hits.length,
+          probability:Math.min(1,hits.length/5)
+        });
+      }
+    });
+    if(catHits.length){
+      dims.push({
+        code:cat.code||"",
+        category:cat.category||"",
+        name:cat.category||"",
+        keywords:Array.from(new Set(catHits)),
+        frequency:catHits.length,
+        probability:Math.min(1,catHits.length/8),
+        perception_frequency:catHits.length
+      });
+      subs=subs.concat(subHits);
+    }
+  });
+  dims.sort(function(a,b){return b.frequency-a.frequency});
+  subs.sort(function(a,b){return b.frequency-a.frequency});
+  if(dims.length){
+    reasons.push("本次使用浏览器内置的本地 CES 分类树和关键词数据兜底。");
+    reasons.push("命中 "+dims.length+" 个一级 CES 类别、"+subs.length+" 个二级子类。");
+  }else{
+    reasons.push("本次使用浏览器内置的本地 CES 数据兜底，但没有命中明确 CES 关键词。");
+  }
+  reasons.push("本地浏览器兜底不运行 Python 机器学习模型，只输出可核实的本地关键词分类结果。");
+  return {
+    ok:true,
+    fallback:true,
+    provider:PROVIDER_LOCAL,
+    source:"browser_local_dataset",
+    message:String(error&&error.message||error||"本地数据集回答"),
+    dataset:"browser_taxonomy_"+(stats.dataset_id||"local"),
+    ces:{
+      active_dimensions:dims,
+      active_subcategories:subs,
+      matched_keywords:keywords
+    },
+    perception_frequency:keywords.length,
+    model:{
+      dataset_id:stats.dataset_id||"browser_local_dataset",
+      confidence:null,
+      note:"浏览器使用本地分类树关键词兜底。"
+    },
+    sentiment_item:{
+      sentiment:null,
+      positive_prob:null,
+      negative_prob:null,
+      confidence:null,
+      note:"本地无情感模型，未输出情感倾向。"
+    },
+    llm_perception:{sentence_analysis:[]},
+    reasons:reasons
+  };
+}
+
+function mergeResult(local,parsed){
+  var result=JSON.parse(JSON.stringify(local));
+  var pp=Number(parsed.positive_prob),np=Number(parsed.negative_prob);
+  result.ok=true;result.fallback=false;result.provider=PROVIDER_DEEPSEEK;
+  result.deepseek={ok:true,fallback:false,model:"deepseek-chat"};
+  result.sentiment_item={sentiment:parsed.sentiment,positive_prob:Number.isFinite(pp)?pp:null,negative_prob:Number.isFinite(np)?np:null,confidence:Math.max(Number.isFinite(pp)?pp:0,Number.isFinite(np)?np:0),note:"情感由 DeepSeek 输出；CES 分类由本地数据集输出。"};
+  result.llm_perception={sentence_analysis:Array.isArray(parsed.sentence_analysis)?parsed.sentence_analysis:[]};
+  result.reasons=(Array.isArray(local.reasons)?local.reasons:[]).concat(Array.isArray(parsed.reasons)?parsed.reasons:[]);
+  return result;
+}
+
+function localOnlyResult(local,error){
+  var result=JSON.parse(JSON.stringify(local));
+  result.ok=true;result.fallback=true;result.provider=PROVIDER_LOCAL;
+  result.deepseek={ok:false,fallback:true,message:String(error&&error.message||error||"DeepSeek 不可用")};
+  result.sentiment_item={sentiment:null,positive_prob:null,negative_prob:null,confidence:result.model&&result.model.confidence,note:"DeepSeek 连接失败，本次只使用本地数据集。"};
+  result.llm_perception={sentence_analysis:[]};
+  var reasons=Array.isArray(local.reasons)?local.reasons:[];
+  result.reasons=reasons.concat(["DeepSeek 不可用，本次使用本地数据集回答。"]);
+  return result;
+}
+
+async function analyze(){
+  var text=$("commentInput").value.trim();
+  var st=$("statusMsg");
+  if(!text){st.textContent="请先输入文本";return}
+  var btn=$("analyzeBtn");btn.disabled=true;st.className="status";st.textContent="正在加载本地数据集...";
+  $("resultSection").style.display="none";
+  try{
+    var local=await getLocalAnalysis(text);
+    st.textContent=local.source==="browser_local_dataset"?"正在连接 DeepSeek；失败则保留本地数据集结果...":"正在连接 DeepSeek...";
+    var result;
+    try{
+      var raw=await callDeepSeek(deepseekMessages(text));
+      result=mergeResult(local,extractJson(raw));
+      $("backendBadge").textContent="DeepSeek 后端已连接";$("backendBadge").className="badge ok";
+    }catch(e){
+      result=localOnlyResult(local,e);
+      $("backendBadge").textContent="DeepSeek 不可用，本地数据集回答";$("backendBadge").className="badge bad";
+      $("deepseekBadge").textContent="浏览器本地数据集可用";$("deepseekBadge").className="badge ok";
+    }
+    renderAll(result,text);
+    st.className="status ok";st.textContent="分析完成，来源："+result.provider;
+  }catch(e){
+    var result=localOnlyResult(browserLocalAnalysis(text,e),e);
+    renderAll(result,text);
+    st.className="status ok";st.textContent="已使用本地数据集兜底。来源："+result.provider;
+  }finally{btn.disabled=false}
+}
+
+function renderAll(result,text){
+  lastResult=result;
+  var ces=result.ces||{},item=result.sentiment_item||{},dims=ces.active_dimensions||[],kws=ces.matched_keywords||[],sents=(result.llm_perception&&result.llm_perception.sentence_analysis)||[];
+  $("providerBadge").textContent=result.provider||"-";$("providerBadge").className="badge "+(result.provider===PROVIDER_DEEPSEEK?"ok":"bad");
+  renderMetrics(result);renderCesBars(dims);renderSubcategories(ces.active_subcategories||[]);renderHighlight(text,kws);renderSentences(sents);renderReasons(result.reasons||[]);
+  var ent={time:new Date().toLocaleString(),text:text.substring(0,50),sentiment:item.sentiment,pos:item.positive_prob,ces:dims.length,provider:result.provider||""};
+  diagHistory.unshift(ent);if(diagHistory.length>MAX_HISTORY)diagHistory=diagHistory.slice(0,MAX_HISTORY);
+  renderHistory();$("jsonOut").textContent=JSON.stringify(result,null,2);$("resultSection").style.display="";
+}
+
+function renderMetrics(r){
+  var item=r.sentiment_item||{},labels={2:"积极",1:"中性",0:"消极"},s=item.sentiment,cls=s===2?"positive":s===0?"negative":"neutral",pf=r.perception_frequency||0;
+  $("metricGrid").innerHTML=
+    '<div class="metric '+cls+'"><span>情感倾向</span><strong>'+(labels[s]||"-")+'</strong><small>sentiment</small></div>'+
+    '<div class="metric positive"><span>积极概率</span><strong>'+fmt(item.positive_prob)+'</strong><small>positive_prob</small></div>'+
+    '<div class="metric negative"><span>消极概率</span><strong>'+fmt(item.negative_prob)+'</strong><small>negative_prob</small></div>'+
+    '<div class="metric neutral"><span>置信度</span><strong>'+fmt(item.confidence)+'</strong><small>confidence</small></div>'+
+    '<div class="metric"><span>感知频率</span><strong>'+fmt(pf)+'</strong><small>CES frequency</small></div>'+
+    '<div class="metric"><span>分析引擎</span><strong style="font-size:13px">'+esc(r.provider||"-")+'</strong><small>provider</small></div>';
+}
+
+var CES_COLORS=["#007aff","#34c759","#ff9f0a","#ff375f","#5856d6","#00c7be","#ff2d55","#af52de","#5ac8fa","#ff6b35","#8e8e93","#30d158","#64d2ff","#ffd60a"];
+function renderCesBars(cats){
+  var el=$("cesBars");if(!cats.length){el.innerHTML='<p style="color:var(--muted)">未命中 CES 维度</p>';$("cesHitCount").textContent="";return}
+  var maxF=Math.max.apply(null,cats.map(function(c){return c.frequency||c.probability||0}))||1;
+  el.innerHTML=cats.map(function(c,i){var score=c.frequency||c.probability||c.perception_frequency||0,w=Math.round(score/maxF*100),color=CES_COLORS[i%14];return '<div class="bar-row"><div class="bar-label">'+esc(c.category||c.name)+'</div><div class="bar-track"><div class="bar-fill" style="width:'+w+'%;background:'+color+'"></div></div><span style="font-size:12px;width:50px">'+score.toFixed(2)+'</span></div>'}).join("");
+  $("cesHitCount").textContent=cats.length+" 类击中";
+}
+function renderSubcategories(items){$("subCats").innerHTML=items.length?items.slice(0,30).map(function(s){return'<span class="badge">'+esc(s.subcategory||s.name)+'</span>'}).join(""):'<span class="badge">无二级子类</span>'}
+function renderHighlight(text,kws){
+  var el=$("highlighted");if(!kws.length){el.innerHTML=esc(text);return}
+  var pattern=kws.map(function(k){return String(k).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}).sort(function(a,b){return b.length-a.length}).join("|");
+  try{el.innerHTML=esc(text).replace(new RegExp("("+pattern+")","g"),'<mark>$1</mark>')}catch(e){el.innerHTML=esc(text)}
+}
+function renderSentences(ss){
+  var labels={2:"积极",1:"中性",0:"消极"},cls={2:"pos",1:"neu",0:"neg"};
+  $("sentenceAnalysis").innerHTML=ss.map(function(s){return '<div class="llm-row"><p>'+esc(s.sentence||"")+'</p><span class="'+(cls[s.sentiment]||"neu")+'" style="font-size:12px">→ '+(labels[s.sentiment]||"-")+'</span></div>'}).join("")||"<p>DeepSeek 未返回分句情感。</p>";
+}
+function renderReasons(rs){$("reasonList").innerHTML=rs.map(function(r){return"<li>"+esc(r)+"</li>"}).join("")||"<li>暂无可分析原因</li>"}
+function renderHistory(){
+  var from=parseInt($("histFrom").value)||1,to=parseInt($("histTo").value)||10;if(from<1)from=1;if(to<from)to=from;if(to>diagHistory.length)to=diagHistory.length;
+  $("histFrom").value=from;$("histTo").value=to;$("historyCount").textContent="共 "+diagHistory.length+" 条";$("histTableSummary").textContent="显示第 "+from+" 至 "+to+" 条，共 "+diagHistory.length+" 条";
+  var labels={2:"积极",1:"中性",0:"消极"},cmap={2:"pos",1:"neu",0:"neg"},slice=diagHistory.slice(from-1,to);
+  $("histBody").innerHTML=slice.map(function(e,i){var idx=from+i,posText=e.pos==null?"-":e.pos.toFixed(3);return '<tr><td>'+idx+'</td><td title="'+esc(e.text)+'">'+esc(e.text).substring(0,30)+'</td><td class="'+(cmap[e.sentiment]||"neu")+'">'+(labels[e.sentiment]||"-")+'</td><td>'+posText+'</td><td>'+e.ces+'</td><td>'+esc(e.provider)+'</td><td style=font-size:11px>'+e.time.substring(5,16)+'</td></tr>'}).join("");
+  var sm=$("histSummary");if(slice.length){var probRows=slice.filter(function(e){return e.pos!=null}),ap=probRows.length?probRows.reduce(function(s,e){return s+e.pos},0)/probRows.length:0,tc=slice.reduce(function(s,e){return s+e.ces},0),pc=slice.filter(function(e){return e.sentiment===2}).length,nc=slice.filter(function(e){return e.sentiment===0}).length,uc=slice.filter(function(e){return e.sentiment===1}).length;sm.innerHTML='<div class="summary-item"><div class="v">'+slice.length+'</div><div class="l">条数</div></div><div class="summary-item"><div class="v">'+(probRows.length?ap.toFixed(3):"-")+'</div><div class="l">均积极概率</div></div><div class="summary-item"><div class="v" style="color:var(--positive)">'+pc+'</div><div class="l">积极</div></div><div class="summary-item"><div class="v" style="color:var(--negative)">'+nc+'</div><div class="l">消极</div></div><div class="summary-item"><div class="v">'+uc+'</div><div class="l">中性</div></div><div class="summary-item"><div class="v">'+tc+'</div><div class="l">CES总计</div></div>'}else{sm.innerHTML=""}
+}
+async function askQuestion(){
+  var q=$("qaInput").value.trim();if(!q){$("qaAnswer").textContent="请先输入问题。";return}
+  $("qaAnswer").textContent="正在回答...";
+  try{
+    var local=lastResult?JSON.stringify({ces:lastResult.ces,reasons:lastResult.reasons}).slice(0,2500):"暂无当前分析结果";
+    var raw=await callDeepSeek([{role:"system",content:"你是 CES 研究助手。结合本地数据集上下文回答，简洁中文。"},{role:"user",content:"问题："+q+"\n\n本地数据集上下文：\n"+local}]);
+    $("qaAnswer").textContent=PROVIDER_DEEPSEEK+"\n\n"+raw;
+  }catch(e){
+    try{var data=await postJson("/api/ces-qa",{question:q,context:getContext(),api_key:getDeepSeekApiKey(),api_base:getDeepSeekApiBase(),model:"deepseek-chat"});$("qaAnswer").textContent=(data.provider||PROVIDER_LOCAL)+"\n\n"+(data.answer||"")}
+    catch(err){$("qaAnswer").textContent=PROVIDER_LOCAL+"\n\n"+browserLocalQa(q,err)}
+  }
+}
+function browserLocalQa(question,error){
+  var ds=window.CES_BROWSER_DATASET||{}, taxonomy=Array.isArray(ds.taxonomy)?ds.taxonomy:[], stats=ds.training_stats||{};
+  var rows=[];
+  taxonomy.forEach(function(cat){
+    var hits=[];
+    if(question.indexOf(cat.category||"")>=0)hits.push(cat.category);
+    (cat.subcategories||[]).forEach(function(sub){
+      if(question.indexOf(sub.name||"")>=0)hits.push(sub.name);
+      (sub.keywords||[]).forEach(function(kw){if(kw&&question.indexOf(kw)>=0)hits.push(kw)});
+    });
+    if(hits.length)rows.push({cat:cat,hits:Array.from(new Set(hits))});
+  });
+  if(!rows.length)rows=taxonomy.slice(0,5).map(function(cat){return{cat:cat,hits:[]}});
+  var lines=["DeepSeek 当前不可用，以下回答基于浏览器内置本地 CES 数据集。","","本地数据概况：","- 一级类别："+taxonomy.length+" 类","- 训练样本："+(stats.sample_count||"未读取")+" 条"];
+  lines.push("","相关 CES 类别：");
+  rows.slice(0,5).forEach(function(row){
+    var subs=(row.cat.subcategories||[]).slice(0,5).map(function(s){return s.name}).join("、");
+    lines.push("- "+(row.cat.code||"")+" "+(row.cat.category||"")+"；相关词："+(row.hits.length?row.hits.join("、"):"未按问题命中，按本地分类树展示")+"；包含子类："+subs);
+  });
+  lines.push("","说明：浏览器本地兜底不调用外部 API，也不生成新引用。错误："+String(error&&error.message||error||"DeepSeek 不可用"));
+  return lines.join("\n");
+}
+async function checkHealth(){
+  var localOk=false;
+  try{
+    var data=await fetchWithTimeout(API_BASE+"/api/health",{cache:"no-store"},12000).then(function(r){return r.json()});
+    localOk=!!data.ok;
+  }catch(e){
+    localOk=!!window.CES_BROWSER_DATASET;
+  }
+  $("deepseekBadge").textContent=localOk?"本地数据集可用":"本地数据集异常";
+  $("deepseekBadge").className="badge "+(localOk?"ok":"bad");
+  if(!getDeepSeekApiKey()){
+    $("backendBadge").textContent="请填写 DeepSeek API Key";
+    $("backendBadge").className="badge bad";
+    return;
+  }
+  try{
+    var raw=await callDeepSeek([{role:"system",content:"只输出 JSON。"},{role:"user",content:'请只回复 {"ok":true}'}]);
+    var ok=!!extractJson(raw).ok;
+    $("backendBadge").textContent=ok?"DeepSeek 后端已连接":"DeepSeek 返回异常";
+    $("backendBadge").className="badge "+(ok?"ok":"bad");
+  }catch(e){
+    $("backendBadge").textContent=localOk?"DeepSeek 不可用，本地数据集回答":"DeepSeek 不可用，本地数据集异常";
+    $("backendBadge").className="badge bad";
+  }
+}
+function clearHistory(){diagHistory=[];renderHistory();$("histBody").innerHTML="";$("histSummary").innerHTML="";$("historyCount").textContent="共 0 条"}
+function copyJson(){if(!lastResult)return;navigator.clipboard.writeText(JSON.stringify(lastResult,null,2));var b=$("copyBtn");b.textContent="已复制!";setTimeout(function(){b.textContent="复制"},1500)}
+function clearAll(){$("commentInput").value="";$("statusMsg").textContent="";$("statusMsg").className="status";$("resultSection").style.display="none";lastResult=null}
+loadDeepSeekSettings();
+checkHealth();
+</script>
+</body>
+</html>
